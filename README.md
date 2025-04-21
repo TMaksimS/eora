@@ -2,7 +2,7 @@
 * Python 3.12.3
 
 ## Запуск приложения
-* установить poetry `pip install poetry`
+* установить poetry `pip install poetry --no-root`
 * в .env.example подставить свой ключ от OpenAI и переименовать в .env `mv .env.example .env`
 * запустить приложение `poetry run python3 main.py`
 
