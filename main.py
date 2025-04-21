@@ -1,3 +1,4 @@
+"""main file для запуска приложения"""
 import json
 
 from scr.ai.assistant import AssistantOpenAI

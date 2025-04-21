@@ -4,7 +4,7 @@ from openai import OpenAI
 from scr.config import LOGER
 from scr.settings import OPENAI_TOKEN, OPENAI_MODEL
 
-PROMPT = ("""
+PROMPT = """
 у меня есть таблица в sqlite: 
 1. Freelancer_ID - Unique identifier for each freelancer in the dataset 
 2. Job_Category - Primary classification of freelance work (Web Development, Data Entry, etc.) 
@@ -20,9 +20,11 @@ PROMPT = ("""
 не надо никаких доплнительных пояснений и описаний, только строгий ответ.
 Если запрос подразумевает обновление или удаление данных из таблицы замени его на
 'select count(*) from freelancers' а в описании укажи, что запрос неккоректен.
-""")
+"""
 
 class AssistantOpenAI:
+    """обьект для взаимодействия с OpenAI"""
+    #pylint: disable = too-few-public-methods
     def __init__(self):
         self._client = OpenAI(api_key=OPENAI_TOKEN)
         self._prompt = PROMPT
@@ -39,7 +41,3 @@ class AssistantOpenAI:
             ]
         )
         return res.choices[0].message.content
-
-
-
-
