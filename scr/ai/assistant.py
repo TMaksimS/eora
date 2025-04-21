@@ -1,4 +1,5 @@
 """Обработчик запросов"""
+import openai
 from openai import OpenAI
 
 from scr.config import LOGER
@@ -31,13 +32,17 @@ class AssistantOpenAI:
         self._model = OPENAI_MODEL
 
     @LOGER.catch
-    def do_response(self, message: str) -> str:
+    def do_response(self, message: str) -> str | None:
         """ответ на сообщение пользователя из openai"""
-        res = self._client.chat.completions.create(
-            model=self._model,
-            messages=[
-                {"role": "developer", "content": self._prompt},
-                {"role": "user", "content": message}
-            ]
-        )
-        return res.choices[0].message.content
+        try:
+            res = self._client.chat.completions.create(
+                model=self._model,
+                messages=[
+                    {"role": "developer", "content": self._prompt},
+                    {"role": "user", "content": message}
+                ]
+            )
+            return res.choices[0].message.content
+        except openai.PermissionDeniedError:
+            LOGER.warning("Проверьте свой токен доступа к OpenAI или VPN")
+            return None
