@@ -1,11 +1,13 @@
 """Обработчик запросов"""
+from typing import Literal
+
 import openai
 from openai import OpenAI
 
 from scr.config import LOGER
 from scr.settings import OPENAI_TOKEN, OPENAI_MODEL
 
-PROMPT = """
+SQL_PROMPT = """
 у меня есть таблица в sqlite: 
 1. Freelancer_ID - Unique identifier for each freelancer in the dataset 
 2. Job_Category - Primary classification of freelance work (Web Development, Data Entry, etc.) 
@@ -23,22 +25,34 @@ PROMPT = """
 'select count(*) from freelancers' а в описании укажи, что запрос неккоректен.
 """
 
+HUMAN_PROMPT = """
+сделай этот ответ удобочитаемым, 
+оставь только ответ на запрос, 
+если надо произведи математические операции, что бы лучше ответить на поставленный вопрос. 
+Ответ на запрос, должен максимально отвечать ему, не забудь про детали.
+"""
+
 class AssistantOpenAI:
     """обьект для взаимодействия с OpenAI"""
     #pylint: disable = too-few-public-methods
     def __init__(self):
         self._client = OpenAI(api_key=OPENAI_TOKEN)
-        self._prompt = PROMPT
+        self._sql_prompt = SQL_PROMPT
+        self._human_prompt = HUMAN_PROMPT
         self._model = OPENAI_MODEL
 
     @LOGER.catch
-    def do_response(self, message: str) -> str | None:
+    def do_response(self, message: str, prompt: Literal['sql', 'human']) -> str | None:
         """ответ на сообщение пользователя из openai"""
         try:
             res = self._client.chat.completions.create(
                 model=self._model,
                 messages=[
-                    {"role": "developer", "content": self._prompt},
+                    {
+                        "role": "developer",
+                        "content":
+                            self._sql_prompt if prompt == 'sql' else self._human_prompt
+                    },
                     {"role": "user", "content": message}
                 ]
             )
